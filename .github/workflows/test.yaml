@@ -22,16 +22,18 @@ jobs:
         with:
           python-version: '3.10'
 
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas numpy scikit-learn matplotlib seaborn
+
       - name: Train model and generate report
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
           python train_model.py
           
           echo "## RF and LR Model Scores" > report.md
           cat scores.txt >> report.md
           
-          # Use GitHub CLI to post the report as a commit comment
           gh pr comment ${{ github.sha }} -b "$(cat report.md)" || echo "Not a PR, skipping comment"
