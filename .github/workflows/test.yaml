@@ -3,6 +3,8 @@ name: Model Training CICD
 permissions:
   id-token: write
   contents: write
+  pull-requests: write
+  issues: write
 
 on:
   push
@@ -26,3 +28,4 @@ jobs:
           cat scores.txt >> report.md
           
           cml comment create report.md
+  
