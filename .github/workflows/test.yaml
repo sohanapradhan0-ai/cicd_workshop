@@ -14,18 +14,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: iterative/setup-cml@v1
-      - uses: actions/checkout@v3
-      
-      - name: Train model
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Train model and generate report
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          pip install --upgrade pip
           pip install -r requirements.txt
           python train_model.py
           
-          echo "RF and LR Model Score" > report.md
+          echo "## RF and LR Model Scores" > report.md
           cat scores.txt >> report.md
           
-          cml comment create report.md
-  
+          # Use GitHub CLI to post the report as a commit comment
+          gh pr comment ${{ github.sha }} -b "$(cat report.md)" || echo "Not a PR, skipping comment"
